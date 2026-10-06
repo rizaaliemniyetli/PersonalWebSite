@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Çikolatayla Print Yapmak</title>
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
+
+    :root { --ink:#24130e; --cream:#fff7e7; --milk:#c77845; --cocoa:#4a2117; --gold:#efbb5d; --leaf:#4f704f; }
+    body[data-theme="dark"] { --ink:#fff2d8; --cream:#2b1712; --milk:#f0bb70; --cocoa:#160a07; --gold:#ffd17c; --leaf:#264735; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#25110d; color:var(--ink); font-family:"DM Mono", monospace; overflow:hidden; }
+    .deck { height:100vh; }
+    .slide { display:none !important; min-height:100vh; position:relative; padding:clamp(28px,5vw,76px); isolation:isolate; overflow:hidden; }
+    .slide.active { display:flex !important; animation:enter .5s ease both; }
+    @keyframes enter { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+    h1,h2,h3,p { margin:0; }
+    h1,h2 { font-family:"Playfair Display", Georgia, serif; font-weight:600; letter-spacing:0; }
+    h1 { font-size:clamp(3.2rem,8vw,8rem); max-width:900px; line-height:.93; }
+    h2 { font-size:clamp(2.2rem,4.8vw,5rem); line-height:1; }
+    h3 { font-size:1rem; text-transform:uppercase; letter-spacing:.12em; }
+    p,li { font-size:clamp(.85rem,1.3vw,1.06rem); line-height:1.6; }
+    .eyebrow { color:var(--milk); text-transform:uppercase; letter-spacing:.15em; font-size:.72rem; margin-bottom:16px; }
+    .number { position:absolute; top:30px; right:38px; color:inherit; font-size:.75rem; opacity:.75; }
+    .slide::after { content:""; position:absolute; width:38vw; height:38vw; max-width:600px; max-height:600px; right:-18vw; bottom:-20vw; border:1px solid currentColor; border-radius:50%; opacity:.16; z-index:-1; }
+
+    .cover { align-items:flex-end; color:#fff8e9; background:linear-gradient(90deg,rgba(35,15,11,.88) 0%,rgba(35,15,11,.4) 57%,rgba(35,15,11,.08)),url('https://images.unsplash.com/photo-1548907040-4d42a6e2f5a2?auto=format&fit=crop&w=1800&q=85') center/cover; }
+    .cover .intro { max-width:950px; padding-bottom:7vh; }
+    .cover h1 em { color:var(--gold); }
+    .cover p { max-width:530px; margin-top:22px; color:#f8dbb8; }
+    .tag { display:inline-flex; margin-top:30px; border:1px solid #f3c475; padding:8px 12px; color:#f5cf8d; font-size:.75rem; }
+
+    .split { display:grid; grid-template-columns:1fr 1fr; gap:clamp(25px,7vw,110px); align-items:center; background:var(--cream); }
+    .split .photo { height:min(67vh,650px); min-height:360px; background-size:cover; background-position:center; position:relative; }
+    .split .photo span { position:absolute; bottom:16px; left:16px; background:var(--cream); padding:8px 10px; font-size:.68rem; }
+    .lead { margin-top:24px; max-width:530px; color:#5d4034; }
+    .chips { display:flex; gap:10px; flex-wrap:wrap; margin-top:28px; }
+    .chip { border:1px solid #bd9b7c; padding:8px 10px; font-size:.72rem; }
+
+    .methods { flex-direction:column; justify-content:center; color:#fff7e7; background:#3c1b13; }
+    .method-grid { margin-top:clamp(20px,4vw,50px); display:grid; grid-template-columns:repeat(4,1fr); gap:14px; width:100%; }
+    .method { border-top:2px solid var(--gold); padding:16px 15px 16px; min-height:300px; background:rgba(255,247,231,.06); }
+    .method-photo { height:96px; margin-bottom:14px; background-size:cover; background-position:center; background-color:#2c140d; }
+    .method b { display:block; color:var(--gold); font-family:"Playfair Display",serif; font-size:1.8rem; margin-bottom:10px; }
+    .method p { font-size:.77rem; color:#e8c8a6; }
+
+    .printer { background:#d6d7c5; align-items:center; }
+    .printer-layout { display:grid; grid-template-columns:1fr 1fr; gap:clamp(25px,6vw,85px); width:100%; align-items:center; }
+    .printer-photo { min-height:390px; height:min(63vh,610px); background:linear-gradient(0deg,rgba(25,15,10,.38),rgba(25,15,10,.04)),url('https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1100&q=85') center/cover; position:relative; }
+    .printer-photo span { position:absolute; left:16px; bottom:16px; background:#24130e; color:#fff7e7; padding:9px 11px; font-size:.7rem; }
+    .printer-list { list-style:none; padding:0; margin:28px 0 0; }
+    .printer-list li { padding:12px 0; border-bottom:1px solid rgba(36,19,14,.28); color:#503a30; }
+    .printer-list b { color:#8c3f23; display:inline-block; min-width:132px; }
+
+    .tools { background:#e8b55d; align-items:center; }
+    .tools-content { width:100%; display:grid; grid-template-columns:.85fr 1.15fr; gap:50px; align-items:center; }
+    .tool-list { list-style:none; padding:0; margin:28px 0 0; border-top:1px solid rgba(36,19,14,.35); }
+    .tool-list li { padding:13px 0; border-bottom:1px solid rgba(36,19,14,.35); display:flex; gap:14px; align-items:baseline; }
+    .tool-list li::before { content:"●"; color:var(--cocoa); font-size:.75rem; }
+    .still-life { height:min(60vh,550px); background:url('https://images.unsplash.com/photo-1481391032119-d89fee407e44?auto=format&fit=crop&w=1100&q=85') center/cover; border:12px solid #f8d58c; box-shadow:18px 18px 0 #733719; }
+
+    .process { background:#f6efe0; flex-direction:column; justify-content:center; }
+    .steps { width:100%; margin-top:32px; display:grid; grid-template-columns:repeat(4,1fr); }
+    .step { border-left:1px solid #876652; padding:0 20px 20px; min-height:355px; }
+    .step:first-child { border-left:0; padding-left:0; }
+    .step-photo { height:100px; margin-bottom:14px; background-size:cover; background-position:center; background-color:#d8c4a0; }
+    .step-num { font-family:"Playfair Display",serif; color:#c77845; font-size:2.6rem; display:block; margin-bottom:12px; }
+    .step h3 { margin-bottom:12px; font-size:.78rem; }
+    .step p { font-size:.78rem; color:#63483c; }
+
+    .temperature { color:#fff7e7; background:#4a2117; align-items:center; }
+    .temp-layout { display:grid; grid-template-columns:1fr 1fr; gap:50px; width:100%; align-items:center; }
+    .temp-layout > p { color:#e6c4a5; margin-top:22px; max-width:470px; }
+    .temp-photo { height:min(58vh,540px); min-height:300px; background:linear-gradient(0deg,rgba(24,11,7,.4),rgba(24,11,7,.05)), url('https://images.unsplash.com/photo-1606312619070-d48b4c652a52?auto=format&fit=crop&w=900&q=85') center/cover; background-color:#2c140d; border:1px solid rgba(255,247,231,.2); }
+    .thermometers { display:grid; gap:13px; margin-top:28px; }
+    .thermo { display:grid; grid-template-columns:115px 1fr 72px; gap:13px; align-items:center; padding:12px 0; border-bottom:1px solid #815846; }
+    .bar { height:12px; background:#6d4132; }
+    .bar span { display:block; height:100%; background:var(--gold); }
+    .thermo strong { color:var(--gold); font-size:1.1rem; }
+
+    .quality { background:var(--leaf); color:#f8f2df; align-items:center; }
+    .quality-grid { width:100%; display:grid; grid-template-columns:1.1fr .9fr; gap:55px; align-items:center; }
+    .quality ul { list-style:none; padding:0; margin:30px 0 0; }
+    .quality li { padding:13px 0; border-bottom:1px solid rgba(255,247,231,.35); }
+    .quality li b { color:#f0c16b; display:inline-block; min-width:126px; }
+    .quality-photo { min-height:450px; height:63vh; background:url('https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=1000&q=85') center/cover; }
+
+    .finish { justify-content:center; flex-direction:column; background:linear-gradient(145deg,#fcf6e9 0%,#e8b55d 100%); }
+    .finish-layout { display:grid; grid-template-columns:1.15fr .85fr; gap:clamp(25px,6vw,80px); align-items:center; width:100%; }
+    .finish h2 { max-width:620px; }
+    .finish h2 em { color:#8c3f23; }
+    .finish .closing { margin-top:26px; max-width:560px; color:#5c3629; }
+    .finish-photo { height:min(56vh,520px); min-height:300px; background:url('https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=900&q=85') center/cover; background-color:#8c3f23; border:10px solid #fff9ec; box-shadow:14px 14px 0 rgba(36,19,14,.18); }
+    .machine-final { background:#d8d7cb; align-items:center; }
+    .machine-final-layout { display:grid; grid-template-columns:.85fr 1.15fr; gap:clamp(25px,6vw,85px); width:100%; align-items:center; }
+    .machine-final-video { width:100%; height:min(68vh,640px); min-height:330px; object-fit:cover; display:block; background:#57463d url('https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1400&q=85') center/cover; border:10px solid #fff9ec; box-shadow:14px 14px 0 rgba(36,19,14,.18); }
+    .machine-final p { max-width:500px; color:#503a30; }
+    .recipe { display:flex; gap:12px; flex-wrap:wrap; margin-top:45px; }
+    .recipe span { background:#fff9ec; padding:13px 17px; border-left:4px solid var(--cocoa); font-size:.76rem; }
+
+    .controls { position:fixed; z-index:10; bottom:22px; right:25px; display:flex; gap:8px; align-items:center; background:rgba(36,19,14,.82); padding:7px; color:#fff7e7; }
+    .controls button { width:38px; height:34px; background:transparent; border:1px solid rgba(255,247,231,.45); color:#fff7e7; font-size:1.1rem; cursor:pointer; }
+    .controls button:hover { background:#efbb5d; color:#24130e; }
+    .counter { font-size:.7rem; min-width:40px; text-align:center; }
+    .page-jump { display:flex; gap:3px; max-width:260px; overflow-x:auto; scrollbar-width:thin; }
+    .page-jump button { width:24px; height:26px; font-size:.65rem; }
+    .page-jump button.active { background:#efbb5d; color:#24130e; border-color:#efbb5d; }
+    .theme-toggle { font-size:.82rem !important; }
+    body:not([data-theme="dark"]) .slide:not(.cover):not(.methods):not(.temperature) :is(h1,h2,h3,p,li,b,strong) { color:#24130e; }
+    body:not([data-theme="dark"]) .slide:is(.cover,.methods,.temperature) :is(h1,h2,h3,p,li,b,strong) { color:#fff7e7; }
+    body[data-theme="dark"] .slide:not(.cover) { background:#25110d !important; }
+    body[data-theme="dark"] .slide { color:#fff7e7; }
+    body[data-theme="dark"] .slide :is(h1,h2,h3,p,li,b,strong) { color:#fff7e7; }
+    body[data-theme="dark"] .slide .eyebrow,
+    body[data-theme="dark"] .slide .step-num,
+    body[data-theme="dark"] .slide .thermo strong { color:var(--gold); }
+    body[data-theme="dark"] .slide .chip,
+    body[data-theme="dark"] .slide .recipe span,
+    body[data-theme="dark"] .slide .split .photo span,
+    body[data-theme="dark"] .slide .printer-photo span { background:#fff7e7; color:#24130e; }
+    @media (max-width:720px) { .slide { padding:68px 25px 75px; overflow:auto; } .split,.tools-content,.temp-layout,.quality-grid,.printer-layout,.finish-layout,.machine-final-layout { grid-template-columns:1fr; gap:24px; } .split .photo,.still-life,.quality-photo,.printer-photo,.temp-photo,.finish-photo,.machine-final-video { height:34vh; min-height:220px; } .method-grid,.steps { grid-template-columns:1fr 1fr; } .method { min-height:auto; } .method-photo { height:76px; } .step { min-height:auto; padding:0 12px 15px; } .step-photo { height:76px; } .step:nth-child(3) { border-left:0; padding-left:0; } .step-num { font-size:2rem; margin-bottom:10px; } .thermo { grid-template-columns:92px 1fr 56px; } .controls { left:12px; right:12px; bottom:12px; justify-content:space-between; } .page-jump { max-width:145px; } }
+  </style>
+</head>
+<body>
+  <main class="deck">
+    <section class="slide cover active"><span class="number">01 / 09</span><div class="intro"><p class="eyebrow">Pastacılık atölyesi</p><h1>Çikolatayla <em>print</em> yapmak</h1><p>Lezzeti tasarımla buluşturan, yenilebilir ve kişiye özel çikolata dekorasyonları.</p><span class="tag">TRANSFER • PIPING • 3D BASKI</span></div></section>
+    <section class="slide split"><span class="number">02 / 09</span><div><p class="eyebrow">Temel fikir</p><h2>Çikolata, bir baskı malzemesidir.</h2><p class="lead">Çizimleri, desenleri, logoları ve fotoğrafları çikolatanın yüzeyine aktarabilir ya da çikolatayı doğrudan şekil veren bir “mürekkep” gibi kullanabiliriz.</p><p class="history-note"><strong>İlk nerede bulundu?</strong> Kakao bitkisinin kökeni Amazon havzasıdır. Çikolatanın içecek olarak ilk kullanımı ise Orta Amerika’daki Olmek ve Maya kültürleriyle ilişkilendirilir.</p><div class="chips"><span class="chip">Yenilebilir</span><span class="chip">Kişiselleştirilebilir</span><span class="chip">El yapımı</span></div></div><div class="photo" style="background-image:url('https://images.unsplash.com/photo-1511381939415-e44015466834?auto=format&fit=crop&w=1100&q=85')"><span>Yüzey + desen + sıcaklık</span></div></section>
+    <section class="slide methods"><span class="number">03 / 09</span><p class="eyebrow">Dört teknik</p><h2>Hangi “print” yolu?</h2><div class="method-grid"><article class="method"><div class="method-photo" style="background-image:url('https://images.unsplash.com/photo-1575377427642-087cf684f29d?auto=format&fit=crop&w=500&q=80')"></div><b>01</b><h3>Transfer sheet</h3><p>Desenli asetat yüzeyine çikolatayı yayarak parlak bir baskı oluşturma.</p></article><article class="method"><div class="method-photo" style="background-image:url('https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=500&q=80')"></div><b>02</b><h3>Piping</h3><p>Sıkma torbası ile yazı, çizgi, kontur ve ince süslemeler yapma.</p></article><article class="method"><div class="method-photo" style="background-image:url('https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=500&q=80')"></div><b>03</b><h3>Stencil</h3><p>Şablon kullanarak kakao veya çikolatayla tekrar eden motifler üretme.</p></article><article class="method"><div class="method-photo" style="background-image:url('https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=500&q=80')"></div><b>04</b><h3>3D baskı</h3><p>Isı kontrollü cihazla katman katman yenilebilir objeler yazdırma.</p></article></div></section>
+    <section class="slide printer"><span class="number">04 / 09</span><div class="printer-layout"><div><p class="eyebrow">Özel ekipman</p><h2>3D çikolata yazıcısı</h2><p class="lead">Isıtılmış kartuş, temperlenmiş çikolatayı nozülden hassas biçimde çıkarır. Tasarım, ince katmanlar halinde gerçek bir yenilebilir objeye dönüşür.</p><ul class="printer-list"><li><b>Modelleme</b> Basit tasarım CAD/STL dosyasına hazırlanır.</li><li><b>Baskı ayarı</b> Düşük hız ve kısa katmanlar tercih edilir.</li><li><b>Soğutma</b> Her katman formunu koruyacak kadar soğutulur.</li><li><b>Başlangıç</b> Harf, logo ve küçük geometrik figürlerle dene.</li></ul></div><div class="printer-photo" aria-label="3D yazıcı fotoğrafı"><span>Çikolata için ısı kontrollü ekstrüzyon</span></div></div></section>
+    <section class="slide tools"><span class="number">05 / 09</span><div class="tools-content"><div><p class="eyebrow">Atölye seti</p><h2>Başlamak için gerekenler</h2><ul class="tool-list"><li>Kuvertür çikolata</li><li>Dijital termometre</li><li>Benmari ve spatula</li><li>Asetat transfer kağıdı</li><li>Sıkma torbası ve ince uç</li></ul></div><div class="still-life" aria-label="Çikolata ve pastacılık malzemeleri fotoğrafı"></div></div></section>
+    <section class="slide process"><span class="number">06 / 09</span><p class="eyebrow">Transfer tekniği</p><h2>4 adımda ilk baskın</h2><div class="steps"><article class="step"><div class="step-photo" style="background-image:url('https://images.unsplash.com/photo-1481391032119-d89fee407e44?auto=format&fit=crop&w=500&q=80')"></div><span class="step-num">1</span><h3>Hazırla</h3><p>Transfer kağıdını düz, temiz ve kuru bir zemine ser.</p></article><article class="step"><div class="step-photo" style="background-image:url('https://images.unsplash.com/photo-1511381939415-e44015466834?auto=format&fit=crop&w=500&q=80')"></div><span class="step-num">2</span><h3>Temperle</h3><p>Çikolatayı uygun çalışma sıcaklığına getir.</p></article><article class="step"><div class="step-photo" style="background-image:url('https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=500&q=80')"></div><span class="step-num">3</span><h3>Yay</h3><p>İnce bir tabaka halinde dök, spatula ile eşitle.</p></article><article class="step"><div class="step-photo" style="background-image:url('https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=500&q=80')"></div><span class="step-num">4</span><h3>Soy</h3><p>Sertleştiğinde asetatı yavaşça kaldır; desen görünür.</p></article></div></section>
+    <section class="slide temperature"><span class="number">07 / 09</span><div class="temp-layout"><div><p class="eyebrow">Başarının anahtarı</p><h2>Temperleme</h2><p>Doğru kristal yapısı; parlak görünüm, temiz kırılma ve elde erimeyen bir yüzey sağlar.</p><div class="thermometers"><div class="thermo"><span>Bitter</span><div class="bar"><span style="width:82%"></span></div><strong>31–32°C</strong></div><div class="thermo"><span>Sütlü</span><div class="bar"><span style="width:76%"></span></div><strong>29–30°C</strong></div><div class="thermo"><span>Beyaz</span><div class="bar"><span style="width:72%"></span></div><strong>28–29°C</strong></div></div></div><div class="temp-photo" aria-label="Temperleme fotoğrafı"></div></div></section>
+    <section class="slide quality"><span class="number">08 / 09</span><div class="quality-grid"><div><p class="eyebrow" style="color:#f0c16b">İyi sonuç için</p><h2>Temiz, parlak, net.</h2><ul><li><b>Yüzey</b> Kuru ve serin çalış.</li><li><b>Nem</b> Su damlası çikolatayı bozar.</li><li><b>Hijyen</b> Gıda sınıfı ekipman kullan.</li><li><b>Saklama</b> 12–18°C, kokusuz ve düşük nemli ortam.</li></ul></div><div class="quality-photo" aria-label="El yapımı çikolatalar fotoğrafı"></div></div></section>
+    <section class="slide finish"><span class="number">09 / 09</span><div class="finish-layout"><div><p class="eyebrow">Kapanış</p><h2>Bir parça çikolatayı <em>imzaya</em> dönüştür.</h2><p class="closing">İlk deneme için transfer sheet ve bitter kuvertür yeterli. Küçük tasarımlarla başla, sıcaklığı takip et, sonra kendi desenlerini üret.</p><div class="recipe"><span>1. Tasarımı seç</span><span>2. Çikolatayı temperle</span><span>3. Baskıyı uygula</span><span>4. Sun ve paylaş</span></div></div><div class="finish-photo" aria-label="Sunuma hazır çikolatalar fotoğrafı"></div></div></section>
+    <section class="slide machine-final"><span class="number">10 / 10</span><div class="machine-final-layout"><div><p class="eyebrow">Son görünüm</p><h2>Çikolata yazıcısı iş başında</h2><p>Temperlenmiş çikolata, ısı kontrollü nozülden çıkar ve katman katman tasarıma dönüşür. Sunumun sonunda makinenin çalışma videosu.</p></div><video class="machine-final-video" controls playsinline preload="metadata" poster="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1400&q=85" aria-label="Çikolata 3D yazıcısı çalışma videosu"><source src="/sunum/cikolata-yazici.mp4" type="video/mp4">Tarayıcınız video oynatmayı desteklemiyor.</video></div></section>
+  </main>
+  <nav class="controls" aria-label="Sunum kontrolleri"><button type="button" id="previous" aria-label="Önceki slayt">←</button><div class="page-jump" aria-label="Slayt seçimi"><button type="button" data-slide="0">1</button><button type="button" data-slide="1">2</button><button type="button" data-slide="2">3</button><button type="button" data-slide="3">4</button><button type="button" data-slide="4">5</button><button type="button" data-slide="5">6</button><button type="button" data-slide="6">7</button><button type="button" data-slide="7">8</button><button type="button" data-slide="8">9</button></div><span class="counter" id="counter">1 / 9</span><button type="button" id="next" aria-label="Sonraki slayt">→</button><button type="button" class="theme-toggle" id="theme-toggle" aria-label="Koyu temayı aç" title="Açık/koyu tema">◐</button></nav>
+  <script>
+    const slides = [...document.querySelectorAll('.slide')];
+    const counter = document.getElementById('counter');
+    const themeToggle = document.getElementById('theme-toggle');
+    const pageButtons = [...document.querySelectorAll('[data-slide]')];
+    const finalPageButton = document.createElement('button');
+    finalPageButton.type = 'button';
+    finalPageButton.dataset.slide = '9';
+    finalPageButton.textContent = '10';
+    document.querySelector('.page-jump').appendChild(finalPageButton);
+    pageButtons.push(finalPageButton);
+    let current = 0;
+    function showSlide(index) { current = ((index % slides.length) + slides.length) % slides.length; slides.forEach((slide, i) => { slide.classList.toggle('active', i === current); slide.querySelector('.number').textContent = `${String(i + 1).padStart(2, '0')} / ${slides.length}`; }); pageButtons.forEach((button, i) => button.classList.toggle('active', i === current)); counter.textContent = `${current + 1} / ${slides.length}`; }
+    function setTheme(theme) { document.body.dataset.theme = theme; themeToggle.setAttribute('aria-label', theme === 'dark' ? 'Açık temayı aç' : 'Koyu temayı aç'); }
+    document.getElementById('previous').addEventListener('click', () => showSlide(current - 1));
+    document.getElementById('next').addEventListener('click', () => showSlide(current + 1));
+    pageButtons.forEach(button => button.addEventListener('click', () => showSlide(Number(button.dataset.slide))));
+    themeToggle.addEventListener('click', () => { const theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark'; setTheme(theme); localStorage.setItem('chocolate-theme', theme); });
+    setTheme(localStorage.getItem('chocolate-theme') || 'light');
+    showSlide(0);
+    document.addEventListener('keydown', (event) => { if (event.key === 'ArrowRight' || event.key === ' ') { event.preventDefault(); showSlide(current + 1); } if (event.key === 'ArrowLeft') { event.preventDefault(); showSlide(current - 1); } });
+  </script>
+</body>
+</html>
