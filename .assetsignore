@@ -1,0 +1,5 @@
+.git
+.vscode
+.assetsignore
+wrangler.jsonc
+CNAME

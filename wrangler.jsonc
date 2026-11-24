@@ -1,0 +1,12 @@
+{
+  // rizaaliemniyetli.com: düz statik HTML, Cloudflare Worker (sadece statik dosya).
+  // Yayın: npx wrangler deploy   (GitHub main'e push edince Cloudflare otomatik yayınlar)
+  "name": "rizaaliemniyetli",
+  "compatibility_date": "2026-11-20",
+  "workers_dev": false,
+  "routes": [
+    { "pattern": "rizaaliemniyetli.com", "custom_domain": true },
+    { "pattern": "www.rizaaliemniyetli.com", "custom_domain": true }
+  ],
+  "assets": { "directory": ".", "html_handling": "auto-trailing-slash", "not_found_handling": "404-page" }
+}
