@@ -3,3 +3,5 @@
 .assetsignore
 wrangler.jsonc
 CNAME
+.wrangler
+.gitignore
